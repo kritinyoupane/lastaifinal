@@ -1,0 +1,7 @@
+﻿  Player.cpp
+C:\Users\Lenovo\Desktop\littleG\LastFinal\LastFinal\Player.cpp(72,86): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+  LastFinal.vcxproj -> C:\Users\Lenovo\Desktop\littleG\LastFinal\LastFinal\Debug\LastFinal.exe
