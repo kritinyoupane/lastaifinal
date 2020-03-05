@@ -1,0 +1,137 @@
+Animation.cpp
+***********************************
+#include "Animation.h"
+
+Animation::Animation()
+{
+}
+
+Animation::Animation(int xPos, int yPos, int width, int height)
+{
+	texture.loadFromFile("avatar1.png");
+	for (int i = 0; i <= nFrames; i++)
+	{
+	 frames[i] = { xPos + i * width, yPos, width, height};
+	}
+}
+
+void Animation::update(sf::Time dt)
+{
+	time += 20 * dt.asSeconds();
+	while (time >= holdTime)
+	{
+		time -= holdTime;
+		nxtUpdate();
+	}
+}
+
+void Animation::applySprite(sf::Sprite& sp) const
+{
+	sp.setTexture(texture);
+	sp.setTextureRect(frames[iFrame]);
+}
+
+
+void Animation::nxtUpdate()
+{
+	if (++iFrame >= nFrames)
+	{
+		iFrame = 0;
+	}
+}
+******************************************************************
+Animation.h
+*********************************************************
+
+#pragma once
+#include <SFML/Graphics.hpp>
+
+class Animation
+{
+private:
+	static constexpr int nFrames =4;
+	static constexpr float holdTime = 4.0;
+	sf::Texture texture;
+	sf::IntRect frames[nFrames];
+	int iFrame = 0;
+	float time = 0.0f;
+public:
+	Animation();
+	Animation(int xPos, int yPos, int width, int height);
+	void update(sf::Time dt);
+	void applySprite(sf::Sprite &sp)const;
+	void nxtUpdate();
+};
+***************************************************
+Main.cpp
+*************************************************************
+#include<iostream>
+#include<SFML/Graphics.hpp>
+#include<SFML/Audio.hpp>
+#include<SFML/System.hpp>
+#include<SFML/Network.hpp>
+#include<SFML/Window.hpp>
+#include<vector>
+#include"Animation.h"
+enum class AnimationIndex
+{
+    walkingRight,
+    walkingLeft,
+    flyingLeft,
+    flyingRight,
+    MaxCount
+};
+
+
+int main()
+{
+   
+    sf::Time deltaTime;
+    sf::Clock clock;
+    Animation animations[int(AnimationIndex::MaxCount)];
+    AnimationIndex curAnimation = AnimationIndex::walkingRight;
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Little G",sf::Style::Fullscreen);
+    sf::Texture avatar;
+    sf::Sprite avatar1;
+    if (!avatar.loadFromFile("avatar1.png"))
+        std::cout << "Can't find the image" << std::endl;
+    avatar1.setPosition(500.f, 100.f);
+    avatar1.setScale(0.5f, 0.5f);
+    animations[int(AnimationIndex::walkingLeft)] = Animation(0, 1200, 300, 600);
+    animations[int(AnimationIndex::walkingRight)] = Animation(0, 0, 300, 600);
+    animations[int(AnimationIndex::flyingLeft)] = Animation(0,1800 , 300, 600);
+    animations[int(AnimationIndex::flyingRight)] = Animation(0, 600, 300, 600);
+    while (window.isOpen())
+    {
+        deltaTime = clock.restart();
+        sf::Event event;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            window.close();
+        }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            {
+                curAnimation = AnimationIndex::walkingRight;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+            {
+                curAnimation = AnimationIndex::walkingLeft;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+            {
+                curAnimation = AnimationIndex::flyingLeft;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            {
+                curAnimation = AnimationIndex::flyingRight;
+            }
+            animations[int(curAnimation)].update(deltaTime);
+            animations[int(curAnimation)].applySprite(avatar1);
+        window.clear();
+        window.draw(avatar1);
+        window.display();
+        
+    }
+        
+    return 0;
+}
